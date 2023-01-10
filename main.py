@@ -1,0 +1,282 @@
+# %%
+"""
+We are going to web scrappe the data from the CNN Brasil website.
+"""
+
+# Date
+
+# WeekDay
+
+# Brazil Stock Market position
+
+# BRL - Dollar
+
+# Info Head CNN Brasil
+
+# Info Head CNN aba Nacional
+
+# Info Head CNN aba Internacional
+
+# Info Head CNN aba Politica
+
+# Info Head CNN aba Business
+
+# Titulo
+# URL
+# Topics
+
+
+
+# %%
+import pandas as pd
+from datetime import datetime
+import requests
+import json
+from pandas_datareader import data as web
+import yfinance as yf
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from time import sleep
+from datetime import date, timedelta
+from selenium.webdriver.chrome.options import Options
+
+#criar um CVS file
+#criar os nomes das colunas
+#adicionar itens nas colunas
+
+# %% [markdown]
+# Creating DataFrame
+
+# %%
+dataset = pd.DataFrame(
+    {"Date":[],
+     "WeekDay":[],
+     "Brazil_Ibovespa":[],
+     "BRL_Dollar":[],
+     "Titulo_CNNBrasil":[],
+     "Url_CNNBrasil":[],
+     "Topics_CNNBrasil":[],
+     "Titulo_CNNNacional":[],
+     "Url_CNNNacional":[],
+     "Topics_CNNNacional":[],
+     "Titulo_CNNInternacional":[],
+     "Url_CNNInternacional":[],
+     "Topics_CNNInternacional":[],
+     "Titulo_CNNPolitica":[],
+     "Url_CNNPolitica":[],
+     "Topics_CNNPolitica":[],
+     "Titulo_CNNBusiness":[],
+     "Url_CNNBusiness":[],
+     "Topics_CNNBusiness":[],
+        })
+dataset.to_csv("dataset.csv", index=False)
+
+# %% [markdown]
+# Creating Variables
+
+# %%
+Date = 1
+WeekDay = 2
+Brazil_Ibovespa = 3
+BRL_Dollar = 4
+Titulo_CNNBrasil = 5
+Url_CNNBrasil = 6
+Topics_CNNBrasil = 7
+Titulo_CNNNacional = 8
+Url_CNNNacional = 9
+Topics_CNNNacional = 10
+Titulo_CNNInternacional = 11
+Url_CNNInternacional = 12
+Topics_CNNInternacional = 13
+Titulo_CNNPolitica = 14
+Url_CNNPolitica = 15
+Topics_CNNPolitica = 16
+Titulo_CNNBusiness = 17
+Url_CNNBusiness = 18
+Topics_CNNBusiness = 19
+
+# %% [markdown]
+# Setup Date Var
+
+# %%
+Date = datetime.now().strftime("%d/%m/%Y")
+Date
+
+# %% [markdown]
+# Setup WeekDay Var
+
+# %%
+date_now = datetime.now()
+WeekDay = date_now.strftime("%A")
+WeekDay
+
+# %% [markdown]
+# Setup Brazil_Ibovespa Var
+
+# %%
+today = date.today()
+start_day = today - timedelta(days = 7)
+tickers_DowJones = "^BVSP"
+datayf = yf.download(tickers_DowJones, start=start_day, end=today)
+datayf = datayf['Adj Close']
+
+Brazil_Ibovespa = datayf[-1]
+Brazil_Ibovespa
+
+# %% [markdown]
+# Setup BRL_Dollar Var
+
+# %%
+requisicao = requests.get('https://economia.awesomeapi.com.br/all/USD-BRL')
+cotacao = requisicao.json()
+BRL_Dollar = cotacao['USD']['bid']
+BRL_Dollar
+
+# %% [markdown]
+# Starting Driver WebScrapping (option to hide windown)
+
+# %%
+driver_exe = 'chromedriver'
+options = Options()
+options.add_argument("--headless")
+driver = webdriver.Chrome(driver_exe, options=options)
+
+
+# %% [markdown]
+# Setup Titulo_CNNBrasil Var
+
+# %%
+driver.get('https://www.cnnbrasil.com.br/')
+Titulo_CNNBrasil = driver.find_element(By.XPATH, '//*[@id="block1847327"]/div/div/a/h2').text
+print(Titulo_CNNBrasil)
+
+# %% [markdown]
+# Setup Url_CNNBrasil Var
+
+# %%
+driver.find_element(By.XPATH, '//*[@id="block1847327"]/div/div/a/h2').click()
+Url_CNNBrasil = driver.current_url
+print(Url_CNNBrasil)
+
+# %% [markdown]
+# Setup Topics_CNNBrasil Var
+
+# %%
+Topics_CNNBrasil =  driver.find_element(By.CLASS_NAME, 'tags__list').text
+Topics_CNNBrasil = Topics_CNNBrasil.replace('\n', ', ')
+print(Topics_CNNBrasil)
+
+# %% [markdown]
+# Setup Titulo_CNNNacional Var
+
+# %%
+driver.get('https://www.cnnbrasil.com.br/nacional/')
+Titulo_CNNNacional = driver.find_element(By.XPATH, '//*[@id="block1810868"]/div/div/div/div[1]/a/div/h3').text
+print(Titulo_CNNNacional)
+
+# %% [markdown]
+# Setup Url_CNNNacional Var
+
+# %%
+driver.find_element(By.XPATH, '//*[@id="block1810868"]/div/div/div/div[1]/a/div/h3').click()
+Url_CNNNacional = driver.current_url
+print(Url_CNNNacional)
+
+# %% [markdown]
+# Setup Topics_CNNNacional Var
+
+# %%
+Topics_CNNNacional = driver.find_element(By.CLASS_NAME, 'tags__list').text
+Topics_CNNNacional = Topics_CNNNacional.replace('\n', ', ')
+print(Topics_CNNNacional)
+
+# %% [markdown]
+# Setup Titulo_CNNInternacional Var
+
+# %%
+driver.get('https://www.cnnbrasil.com.br/internacional/')
+Titulo_CNNInternacional = driver.find_element(By.XPATH, '//*[@id="block1810871"]/div/div/div/div[1]/a/div/h3').text
+print(Titulo_CNNInternacional)
+
+# %% [markdown]
+# Setup Url_CNNInternacional Var
+
+# %%
+driver.find_element(By.XPATH, '//*[@id="block1810871"]/div/div/div/div[1]/a/div/h3').click()
+Url_CNNInternacional = driver.current_url
+print(Url_CNNInternacional)
+
+# %% [markdown]
+# Setup Topics_CNNInternacional Var
+
+# %%
+Topics_CNNInternacional = driver.find_element(By.CLASS_NAME, 'tags__list').text
+Topics_CNNInternacional = Topics_CNNInternacional.replace('\n', ', ')
+print(Topics_CNNInternacional)
+
+# %% [markdown]
+# Setup Titulo_CNNPolitica Var
+
+# %%
+driver.get('https://www.cnnbrasil.com.br/politica/')
+Titulo_CNNPolitica = driver.find_element(By.XPATH, '//*[@id="block1810865"]/div/div/div/div[1]/a/div/h3').text
+print(Titulo_CNNPolitica)
+
+# %% [markdown]
+# Setup Url_CNNPolitica Var
+
+# %%
+driver.find_element(By.XPATH, '//*[@id="block1810865"]/div/div/div/div[1]/a/div/h3').click()
+Url_CNNPolitica = driver.current_url
+print(Url_CNNPolitica)
+
+# %% [markdown]
+# Setup Topics_CNNPolitica Var
+
+# %%
+Topics_CNNPolitica = driver.find_element(By.CLASS_NAME, 'tags__list').text
+Topics_CNNPolitica = Topics_CNNPolitica.replace('\n', ', ')
+print(Topics_CNNPolitica)
+
+# %% [markdown]
+# Setup Titulo_CNNBusniess Var
+
+# %%
+driver.get('https://www.cnnbrasil.com.br/business/')
+Titulo_CNNBusiness = driver.find_element(By.XPATH, '//*[@id="block1823937"]/div/div/a/h2').text
+print(Titulo_CNNBusiness)
+
+# %% [markdown]
+# Setup Url_CNNBusniess Var
+
+# %%
+driver.find_element(By.XPATH, '//*[@id="block1823937"]/div/div/a/h2').click()
+Url_CNNBusiness = driver.current_url
+print(Url_CNNBusiness)
+
+# %% [markdown]
+# Setup Topics_CNNBusniess Var
+
+# %%
+Topics_CNNBusiness = driver.find_element(By.CLASS_NAME, 'tags__list').text
+Topics_CNNBusiness = Topics_CNNBusiness.replace('\n', ', ')
+print(Topics_CNNBusiness)
+
+# %%
+driver.close()
+
+# %% [markdown]
+# Add Row to DataFrame
+
+# %%
+dataset = pd.concat([dataset, pd.DataFrame({"Date":[Date], "WeekDay":[WeekDay], "Brazil_Ibovespa":[Brazil_Ibovespa], "BRL_Dollar":[BRL_Dollar], "Titulo_CNNBrasil":[Titulo_CNNBrasil], "Url_CNNBrasil":[Url_CNNBrasil], "Topics_CNNBrasil":[Topics_CNNBrasil], "Titulo_CNNNacional":[Titulo_CNNNacional], "Url_CNNNacional":[Url_CNNNacional], "Topics_CNNNacional":[Topics_CNNNacional], "Titulo_CNNInternacional":[Titulo_CNNInternacional], "Url_CNNInternacional":[Url_CNNInternacional], "Topics_CNNInternacional":[Topics_CNNInternacional], "Titulo_CNNPolitica":[Titulo_CNNPolitica], "Url_CNNPolitica":[Url_CNNPolitica], "Topics_CNNPolitica":[Topics_CNNPolitica], "Titulo_CNNBusiness":[Titulo_CNNBusiness], "Url_CNNBusiness":[Url_CNNBusiness], "Topics_CNNBusiness":[Topics_CNNBusiness]})], ignore_index=True)
+# dataset = dataset.append({"Date":Date, "WeekDay": WeekDay}, ignore_index=True)
+dataset.to_csv('dataset_news.csv', index=False, encoding="utf-8-sig", sep = ';')
+
+# %% [markdown]
+# Saving DataFrame as CSV
+
+# %%
+print(f'Adicionado {Date} - {WeekDay} ao dataset')
+
+
