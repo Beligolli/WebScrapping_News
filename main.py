@@ -39,6 +39,7 @@ from selenium.webdriver.common.by import By
 from time import sleep
 from datetime import date, timedelta
 from selenium.webdriver.chrome.options import Options
+import pyodbc
 
 #criar um CVS file
 #criar os nomes das colunas
@@ -303,8 +304,28 @@ print(dataset)
 dataset.to_csv(r'C:\Users\belig\OneDrive\Python\MeuProjeto\Projetos\WebScrapping_News\WebScrapping_News\dataset_news.csv', index=False, encoding="utf-8-sig", sep = ';')
 
 # %% [markdown]
-# Saving DataFrame as CSV
+# Add info to SQL Server
+dados_conexao = (
+    "Driver={SQL Server};"
+    "Server=Beligolli;"
+    "Database=WebScrappingNews;"
+    'Trusted_Connection=yes;'
+    # UID  = Login;
+    # PWD=Senha;
+)
 
+
+conexao = pyodbc.connect(dados_conexao)
+cursor = conexao.cursor()
+
+comando = "INSERT INTO NewsDataBase (Date_Hour, WeekDay_, Brazil_Ibovespa, BRL_Dollar, Titulo_CNNBrasil, Url_CNNBrasil, Topics_CNNBrasil, Titulo_CNNNacional, Url_CNNNacional, Topics_CNNNacional, Titulo_CNNInternacional, Url_CNNInternacional, Topics_CNNInternacional, Titulo_CNNPolitica, Url_CNNPolitica, Topics_CNNPolitica, Titulo_CNNBusiness, Url_CNNBusiness, Topics_CNNBusiness) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+
+valores = (Date, WeekDay, Brazil_Ibovespa, BRL_Dollar, Titulo_CNNBrasil, Url_CNNBrasil, Topics_CNNBrasil, Titulo_CNNNacional, Url_CNNNacional, Topics_CNNNacional, Titulo_CNNInternacional, Url_CNNInternacional, Topics_CNNInternacional, Titulo_CNNPolitica, Url_CNNPolitica, Topics_CNNPolitica, Titulo_CNNBusiness, Url_CNNBusiness, Topics_CNNBusiness)
+
+cursor.execute(comando, valores)
+cursor.commit()
+cursor.close()
+conexao.close()
 # %%
 
 print(f'Adicionado {Date} - {WeekDay} ao dataset')
